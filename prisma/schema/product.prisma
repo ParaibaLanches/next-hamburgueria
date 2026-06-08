@@ -1,0 +1,30 @@
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique @db.VarChar(100)
+  description String?   @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  products Product[]
+}
+
+model Product {
+  id               Int       @id @default(autoincrement())
+  name             String    @db.VarChar(255)
+  description      String?   @db.Text
+  price            Decimal   @db.Decimal(10, 2)
+  categoryId       Int
+  category         Category  @relation(fields: [categoryId], references: [id])
+  imageUrl         String?   @db.VarChar(500)
+  isFeatured       Boolean   @default(false)
+  featuredSlot     String?   @default("none") @db.VarChar(50)
+  promotionLabel   String?   @default("") @db.VarChar(100)
+  promotionalPrice Decimal?  @db.Decimal(10, 2)
+  available        Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  orderItems OrderItem[]
+}

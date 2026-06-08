@@ -1,0 +1,37 @@
+services:
+  next-app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    volumes:
+      - ..:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://caixa:caixapass@postgres:5432/caixa_db?schema=public
+      - JWT_SECRET=caixa_super_secret_key_123
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=caixa
+      - POSTGRES_PASSWORD=caixapass
+      - POSTGRES_DB=caixa_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

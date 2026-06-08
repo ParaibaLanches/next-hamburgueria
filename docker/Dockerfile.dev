@@ -1,0 +1,18 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json* ./
+RUN npm install
+
+# Copy project files
+COPY . .
+
+# Generate prisma client
+RUN npx prisma generate
+
+EXPOSE 3000
+
+# Run dev mode
+CMD ["npm", "run", "dev"]

@@ -1,0 +1,38 @@
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(255)
+  email     String    @unique @db.VarChar(255)
+  password  String    @db.VarChar(255)
+  role      String    @default("cashier") @db.VarChar(50)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  orders   Order[]
+  closures Closure[]
+}
+
+model Client {
+  id           Int       @id @default(autoincrement())
+  name         String?   @db.VarChar(255)
+  email        String    @unique @db.VarChar(255)
+  password     String    @db.VarChar(255)
+  document     String?   @db.VarChar(50)
+  phone        String?   @db.VarChar(50)
+  address      String?   @db.Text
+  cep          String?   @db.VarChar(10)
+  street       String?   @db.VarChar(255)
+  number       String?   @db.VarChar(20)
+  neighborhood String?   @db.VarChar(100)
+  city         String?   @db.VarChar(100)
+  state        String?   @db.VarChar(50)
+  complement   String?   @db.VarChar(255)
+  avatarUrl    String?   @db.VarChar(500)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  customerOrders Order[]  @relation("CustomerOrders")
+  clientOrders   Order[]  @relation("ClientOrders")
+  coupons        Coupon[]
+}
