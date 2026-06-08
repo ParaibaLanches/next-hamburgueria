@@ -11,38 +11,10 @@ Este projeto é a migração do sistema **Paraíba Lanches** (anteriormente sepa
 
 ---
 
-## 📋 Lista de Tarefas (Progresso da Migração)
+## 📋 Histórico Recente de Entregas
 
-Aqui está a lista do que já fizemos e o que falta para terminarmos a migração completa:
-
-- [x] **1. Inicialização e Infraestrutura**
-  - [x] Criar projeto base do Next.js
-  - [x] Configurar Docker (`docker-compose.yml`, `Dockerfile`, `.dockerignore`)
-- [x] **2. Banco de Dados (Prisma)**
-  - [x] Instalar Prisma
-  - [x] Mapear modelos antigos do Go (User, Product, Order, etc.) para `schema.prisma`
-  - [x] Criar primeira migration (`init`)
-- [x] **3. Migração do Backend (API Routes)**
-  - [x] Rota de Autenticação (Login/Me) e Middleware JWT
-  - [x] Rota de Categorias e Produtos (`/api/products`, `/api/categories`)
-  - [x] Rota de Pedidos (`/api/orders`)
-  - [x] Rota de Clientes (`/api/clients`)
-  - [x] Lógicas de cálculo de frete (Google Maps) e validação complexa de Pedidos
-  - [x] Rotas de Fechamento de Caixa (`/api/closures`)
-  - [x] Rotas de Configuração (`/api/settings`) e Relatórios (`/api/reports`)
-  - [x] Rotas de Cupons (`/api/coupons`) e Promoções/Vitrine (`/api/merchandising`, `/api/promotions`)
-- [x] **4. Migração do Frontend (Pages & Components)**
-  - [x] Copiar `tailwind.config`, `components.json` e utilitários
-  - [x] Migrar componentes do shadcn/ui para a nova estrutura
-  - [x] Migrar páginas principais (`/pdv`, `/dashboard`, `/menu`, etc.)
-  - [x] Integrar chamadas frontend (Zustand/Axios/Fetch) para as novas rotas API internas do Next.js
-- [x] **5. Aprimoramentos Finais e Correções (Em Andamento)**
-  - [x] **Componentização**: Divisão de páginas gigantes (God Objects) como `/settings`, `/new-order` e `/coupons` em componentes menores (ex: `AddressAutocomplete`, `CartSidebar`, etc).
-  - [x] **Otimização de Imagens**: Migração de tags `<img>` para `next/image` (`<Image>`) configurando o `remotePatterns`.
-  - [x] **Hydration**: Uso seguro de `localStorage` via Zustand `persist` nas stores.
-  - [x] **Limpeza de Tipagem**: Remoção de tipos genéricos `any` (`<any>`) nas rotas da API e substituição por interfaces TypeScript estritas.
-  - [x] **Desafio de Tempo Real (Escalabilidade)**: Expandir o SSE (Server-Sent Events) atual que usa Event Emitter em memória para uma solução escalável baseada em Redis Pub/Sub, garantindo sincronização de novos pedidos no painel entre múltiplos containers Docker em produção.
-  - [x] **Testes e Deploy**: Validar compatibilidade 100% no ambiente Docker, garantindo o build perfeito para produção e criar testes E2E do PDV com Playwright.
+- [x] **1. Módulo Financeiro**
+  - [x] **"Fechamento de Caixa" Cego**: Fluxo rigoroso implementado onde o operador precisa declarar os valores físicos contados no caixa (dinheiro, pix, cartões) antes de ver o total esperado pelo sistema, facilitando a identificação de "quebras" de caixa pelo proprietário (`/api/closures/[id]/close`).
 
 ---
 
@@ -50,11 +22,10 @@ Aqui está a lista do que já fizemos e o que falta para terminarmos a migraçã
 
 O sistema central de PDV está pronto e migrado. Abaixo estão as frentes de evolução que planejamos desenvolver para tornar o sistema um PDV e Gestor ultra-robusto:
 
-- [ ] **1. Módulo Financeiro e "Fechamento de Caixa" Cego**: Criar um fluxo rigoroso onde o operador precisa declarar os valores físicos contados no caixa antes de ver o total esperado pelo sistema, facilitando a identificação de "quebras" de caixa pelo proprietário.
-- [ ] **2. Integração de Pagamentos Reais (Pix/Cartão)**: Integração com APIs como Mercado Pago ou Stripe para gerar QR Codes dinâmicos em tempo real na tela, alterando o status do pedido para "Pago" de forma totalmente automatizada.
-- [ ] **3. Painel de Logística (Gestão de Entregadores)**: Módulo de expedição onde o gerente atribui pedidos prontos a motoboys específicos, garantindo controle de tempo de entrega e geração de relatórios de repasse financeiro (fretes) no fim da noite.
-- [ ] **4. KDS (Kitchen Display System - Tela da Cozinha)**: Rota dedicada para tablets ou TVs na cozinha. Pedidos caem na tela em tempo real (via Redis), substituindo a impressão em papel. O cozinheiro marca como "Pronto" e avisa o PDV instantaneamente.
-- [ ] **5. Emissão de Notas Fiscais (NFC-e / SAT)**: Integração com serviços de emissão fiscal para gerar cupons eletrônicos no ato do fechamento do pedido de acordo com as leis estaduais.
+- [ ] **1. Integração de Pagamentos Reais (Pix/Cartão)**: Integração com APIs como Mercado Pago ou Stripe para gerar QR Codes dinâmicos em tempo real na tela, alterando o status do pedido para "Pago" de forma totalmente automatizada.
+- [ ] **2. Painel de Logística (Gestão de Entregadores)**: Módulo de expedição onde o gerente atribui pedidos prontos a motoboys específicos, garantindo controle de tempo de entrega e geração de relatórios de repasse financeiro (fretes) no fim da noite.
+- [ ] **3. KDS (Kitchen Display System - Tela da Cozinha)**: Rota dedicada para tablets ou TVs na cozinha. Pedidos caem na tela em tempo real (via Redis), substituindo a impressão em papel. O cozinheiro marca como "Pronto" e avisa o PDV instantaneamente.
+- [ ] **4. Emissão de Notas Fiscais (NFC-e / SAT)**: Integração com serviços de emissão fiscal para gerar cupons eletrônicos no ato do fechamento do pedido de acordo com as leis estaduais.
 
 ---
 
