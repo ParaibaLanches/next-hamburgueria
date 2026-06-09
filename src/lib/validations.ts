@@ -10,7 +10,8 @@ export const productSchema = z.object({
   featuredSlot: z.string().optional(),
   promotionLabel: z.string().optional(),
   promotionalPrice: z.number().optional(),
-  available: z.boolean().optional()
+  available: z.boolean().optional(),
+  ingredientIds: z.array(z.number()).optional()
 })
 
 export const categorySchema = z.object({

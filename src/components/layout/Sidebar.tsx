@@ -38,6 +38,7 @@ const navGroups = [
       { to: '/clients', icon: Contact, label: 'Clientes', roles: ['admin'] },
       { to: '/products', icon: Package, label: 'Produtos', roles: ['admin'] },
       { to: '/categories', icon: Tag, label: 'Categorias', roles: ['admin'] },
+      { to: '/ingredients', icon: UtensilsCrossed, label: 'Ingredientes', roles: ['admin'] },
       { to: '/merchandising', icon: Layout, label: 'Vitrina', roles: ['admin'] },
       { to: '/coupons', icon: Ticket, label: 'Cupons', roles: ['admin'] },
       { to: '/users', icon: Users, label: 'Usuarios', roles: ['admin'] },

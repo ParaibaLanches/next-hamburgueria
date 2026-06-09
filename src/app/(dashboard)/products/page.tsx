@@ -101,13 +101,13 @@ export default function ProductsPage() {
     setForm({
       name: product.name,
       description: product.description,
-      price: product.price.toString(),
-      category_id: product.category_id,
-      image_url: product.image_url,
-      is_featured: product.is_featured || false,
-      featured_slot: product.featured_slot || 'none',
-      promotion_label: product.promotion_label || '',
-      promotional_price: product.promotional_price ? product.promotional_price.toString() : '',
+      price: Number(product.price).toFixed(2).replace('.', ','),
+      category_id: (product.category_id !== undefined ? product.category_id : (product as any).categoryId) || 0,
+      image_url: product.image_url || (product as any).imageUrl || '',
+      is_featured: product.is_featured || (product as any).isFeatured || false,
+      featured_slot: product.featured_slot || (product as any).featuredSlot || 'none',
+      promotion_label: product.promotion_label || (product as any).promotionLabel || '',
+      promotional_price: (product.promotional_price || (product as any).promotionalPrice) ? Number(product.promotional_price || (product as any).promotionalPrice).toFixed(2).replace('.', ',') : '',
       discount_percentage: '',
       ingredient_ids: product.ingredients?.map(i => i.id) || []
     })
@@ -223,12 +223,12 @@ export default function ProductsPage() {
                 <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               </div>
               <div className="space-y-2">
-                <Label>Descricao</Label>
+                <Label>Descrição</Label>
                 <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Preco (R$)</Label>
+                  <Label>Preço (R$)</Label>
                   <Input 
                     type="text" 
                     value={form.price} 
@@ -419,9 +419,9 @@ export default function ProductsPage() {
                 <TableRow key={product.id}>
                   <TableCell>
                     <div className="relative h-10 w-10 rounded-md overflow-hidden bg-muted border">
-                      {product.image_url ? (
+                      {(product.image_url || (product as any).imageUrl) ? (
                         <Image 
-                          src={getFullImageUrl(product.image_url)!} 
+                          src={getFullImageUrl(product.image_url || (product as any).imageUrl)!} 
                           alt={product.name}
                           fill
                           className="object-cover"
@@ -436,14 +436,14 @@ export default function ProductsPage() {
                   </TableCell>
                   <TableCell className="font-medium">
                     {product.name}
-                    {product.promotion_label && (
+                    {(product.promotion_label || (product as any).promotionLabel) && (
                       <Badge variant="outline" className="ml-2 h-5 text-[10px] border-amber-500 text-amber-600">
-                        {product.promotion_label}
+                        {product.promotion_label || (product as any).promotionLabel}
                       </Badge>
                     )}
-                    {product.featured_slot !== 'none' && (
+                    {((product.featured_slot || (product as any).featuredSlot) && (product.featured_slot || (product as any).featuredSlot) !== 'none') && (
                       <Badge variant="default" className="ml-2 h-5 text-[10px] bg-amber-500">
-                        {product.featured_slot === 'hero' ? 'Hero' : product.featured_slot === 'bento_1' ? 'Bento 1' : 'Bento 2'}
+                        {(product.featured_slot || (product as any).featuredSlot) === 'hero' ? 'Hero' : (product.featured_slot || (product as any).featuredSlot) === 'bento_1' ? 'Bento 1' : 'Bento 2'}
                       </Badge>
                     )}
                   </TableCell>
@@ -451,10 +451,10 @@ export default function ProductsPage() {
                     <Badge variant="secondary">{capitalize(product.category?.name || 'Sem categoria')}</Badge>
                   </TableCell>
                   <TableCell>
-                    {product.promotional_price ? (
+                    {(product.promotional_price || (product as any).promotionalPrice) ? (
                       <div className="flex flex-col">
                         <span className="text-xs line-through text-muted-foreground">{formatCurrency(product.price)}</span>
-                        <span className="font-bold text-green-600">{formatCurrency(product.promotional_price)}</span>
+                        <span className="font-bold text-green-600">{formatCurrency(product.promotional_price || (product as any).promotionalPrice)}</span>
                       </div>
                     ) : (
                       formatCurrency(product.price)

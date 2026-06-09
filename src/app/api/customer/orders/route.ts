@@ -71,7 +71,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
-    const { order_type, notes, items, payments } = body
+    const { order_type, notes, items, payments, delivery_fee = 0, discount_amount = 0 } = body
 
     if (!items || items.length === 0) {
       return NextResponse.json({ success: false, message: 'Pedido deve conter itens' }, { status: 400 })
@@ -98,14 +98,17 @@ export async function POST(req: Request) {
       })
     }
 
+    const finalTotal = calculatedTotal + Number(delivery_fee) - Number(discount_amount)
+
     const code = Math.random().toString(36).substring(2, 6).toUpperCase()
 
     const order = await prisma.order.create({
       data: {
         code,
         orderType: order_type || 'delivery',
-        total: calculatedTotal,
-        subtotal: calculatedTotal,
+        total: finalTotal > 0 ? finalTotal : 0,
+        deliveryFee: Number(delivery_fee),
+        discountAmount: Number(discount_amount),
         notes: notes || '',
         customerId: client.id,
         items: {

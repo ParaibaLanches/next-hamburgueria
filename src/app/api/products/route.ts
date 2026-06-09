@@ -6,7 +6,7 @@ import { z } from 'zod'
 export async function GET(req: Request) {
   try {
     const products = await prisma.product.findMany({
-      include: { category: true },
+      include: { category: true, ingredients: true },
       orderBy: { name: 'asc' }
     })
     return NextResponse.json({ success: true, data: products })
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       }
       throw e;
     }
-    const { name, description, price, categoryId, imageUrl, isFeatured, featuredSlot, promotionLabel, promotionalPrice, available } = body
+    const { name, description, price, categoryId, imageUrl, isFeatured, featuredSlot, promotionLabel, promotionalPrice, available, ingredientIds } = body
 
     if (!name || price === undefined || !categoryId) {
       return NextResponse.json({ success: false, message: 'Missing required fields' }, { status: 400 })
@@ -41,9 +41,15 @@ export async function POST(req: Request) {
         categoryId,
         imageUrl,
         isFeatured: isFeatured || false,
-        available: available !== undefined ? available : true
+        available: available !== undefined ? available : true,
+        featuredSlot,
+        promotionLabel,
+        promotionalPrice,
+        ingredients: ingredientIds && ingredientIds.length > 0 ? {
+          connect: ingredientIds.map((id: number) => ({ id }))
+        } : undefined
       },
-      include: { category: true }
+      include: { category: true, ingredients: true }
     })
 
     return NextResponse.json({ success: true, data: product }, { status: 201 })

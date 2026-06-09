@@ -153,9 +153,24 @@ export const productsApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then((r) => r.data)
   },
-  
   getIngredients: () =>
     api.get<ApiResponse<Ingredient[]>>('/api/ingredients').then((r) => r.data),
+}
+
+// ========== Ingredients API ==========
+
+export const ingredientsApi = {
+  getAll: () =>
+    api.get<ApiResponse<Ingredient[]>>('/api/ingredients').then((r) => r.data),
+
+  create: (req: Partial<Ingredient>) =>
+    api.post<ApiResponse<Ingredient>>('/api/ingredients', req).then((r) => r.data),
+
+  update: (id: number, req: Partial<Ingredient>) =>
+    api.put<ApiResponse<Ingredient>>(`/api/ingredients/${id}`, req).then((r) => r.data),
+
+  delete: (id: number) =>
+    api.delete<ApiResponse<string>>(`/api/ingredients/${id}`).then((r) => r.data),
 }
 
 // ========== Orders API ==========
