@@ -6,7 +6,21 @@ export async function GET(req: Request) {
     const coupons = await prisma.coupon.findMany({
       orderBy: { createdAt: 'desc' }
     })
-    return NextResponse.json({ success: true, data: coupons })
+    
+    const mapped = coupons.map(c => ({
+      ...c,
+      min_purchase: Number(c.minPurchase),
+      usage_limit: c.usageLimit,
+      used_count: c.usedCount,
+      starts_at: c.startsAt,
+      expires_at: c.expiresAt,
+      is_active: c.isActive,
+      client_id: c.clientId,
+      created_at: c.createdAt,
+      updated_at: c.updatedAt
+    }))
+    
+    return NextResponse.json({ success: true, data: mapped })
   } catch (error: unknown) {
     return NextResponse.json({ success: false, message: error instanceof Error ? error.message : String(error) }, { status: 500 })
   }

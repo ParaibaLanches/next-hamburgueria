@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Ticket, Infinity, Calendar, Eye, Trash, Loader2 } from 'lucide-react'
-import { formatDateTime } from '@/lib/date'
+import { formatDateShort } from '@/lib/date'
 import { formatCurrency } from '@/lib/utils'
 import type { Coupon } from '@/types'
 
@@ -88,15 +88,17 @@ export default function CouponList({ coupons, isLoading, onDelete, onViewDetails
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm">{formatDateTime(coupon.starts_at)}</span>
+                    <span className="text-sm">{formatDateShort(coupon.starts_at)}</span>
                   </TableCell>
                   <TableCell>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold">{formatDateTime(coupon.expires_at)}</span>
-                      <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {coupon.time_left}
-                      </span>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-sm font-bold">{formatDateShort(coupon.expires_at)}</span>
+                      {coupon.time_left && (
+                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-sm w-fit font-medium">
+                          <Calendar className="h-2.5 w-2.5" />
+                          {coupon.time_left}
+                        </span>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
