@@ -1,0 +1,11 @@
+model Setting {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     // null = global setting, non-null = user-specific setting
+  user      User?    @relation(fields: [userId], references: [id])
+  key       String   @db.VarChar(100)
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, key])
+}

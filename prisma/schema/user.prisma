@@ -10,6 +10,7 @@ model User {
 
   orders   Order[]
   closures Closure[]
+  settings Setting[]
 }
 
 model Client {
