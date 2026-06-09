@@ -44,7 +44,7 @@ export default function Header({ wsStatus }: { wsStatus?: 'connecting' | 'open' 
   return (
     <header className="h-16 border-b bg-card flex items-center justify-between px-6 sticky top-0 z-40">
       <div className="flex items-center gap-4">
-        {isAdmin && (
+        {(isAdmin || isCashier) && (
           <Button 
             variant="outline" 
             size="sm" 

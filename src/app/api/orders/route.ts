@@ -97,6 +97,26 @@ export async function POST(req: Request) {
     // Emit event for real-time updates
     appEmitter.emit('new_order', order)
 
+    // Update active closure totals synchronously
+    if (activeClosure && payments && payments.length > 0) {
+      let addCash = 0, addPix = 0, addCredit = 0, addDebit = 0;
+      for (const p of payments) {
+        if (p.method === 'cash') addCash += p.amount;
+        if (p.method === 'pix') addPix += p.amount;
+        if (p.method === 'credit_card') addCredit += p.amount;
+        if (p.method === 'debit_card') addDebit += p.amount;
+      }
+      await prisma.closure.update({
+        where: { id: activeClosure.id },
+        data: {
+          totalCash: { increment: addCash },
+          totalPix: { increment: addPix },
+          totalCredit: { increment: addCredit },
+          totalDebit: { increment: addDebit },
+        }
+      });
+    }
+
     return NextResponse.json({ success: true, data: order }, { status: 201 })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'

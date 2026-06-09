@@ -102,6 +102,11 @@ export async function POST(req: Request) {
 
     const code = Math.random().toString(36).substring(2, 6).toUpperCase()
 
+    // Find active closure to attach to this order
+    const activeClosure = await prisma.closure.findFirst({
+      where: { status: 'open' }
+    })
+
     const order = await prisma.order.create({
       data: {
         code,
@@ -111,6 +116,7 @@ export async function POST(req: Request) {
         discountAmount: Number(discount_amount),
         notes: notes || '',
         customerId: client.id,
+        closureId: activeClosure?.id,
         items: {
           create: processedItems
         },
@@ -126,6 +132,26 @@ export async function POST(req: Request) {
         payments: true
       }
     })
+
+    // Update active closure totals synchronously
+    if (activeClosure && payments && payments.length > 0) {
+      let addCash = 0, addPix = 0, addCredit = 0, addDebit = 0;
+      for (const p of payments) {
+        if (p.method === 'cash') addCash += Number(p.amount);
+        if (p.method === 'pix') addPix += Number(p.amount);
+        if (p.method === 'credit_card' || p.method === 'credit') addCredit += Number(p.amount);
+        if (p.method === 'debit_card' || p.method === 'debit') addDebit += Number(p.amount);
+      }
+      await prisma.closure.update({
+        where: { id: activeClosure.id },
+        data: {
+          totalCash: { increment: addCash },
+          totalPix: { increment: addPix },
+          totalCredit: { increment: addCredit },
+          totalDebit: { increment: addDebit },
+        }
+      }).catch(() => {})
+    }
 
     // Emit event for real-time updates to admin PDV
     appEmitter.emit('new_order', order)
