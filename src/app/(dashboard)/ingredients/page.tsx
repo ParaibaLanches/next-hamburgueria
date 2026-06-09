@@ -113,7 +113,7 @@ export default function IngredientsPage() {
                 {ingredients.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">#{item.id}</TableCell>
-                    <TableCell>{item.name}</TableCell>
+                    <TableCell className="capitalize">{item.name}</TableCell>
                     <TableCell>{item.createdAt ? formatDate(item.createdAt) : '-'}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" onClick={() => openEdit(item)}>

@@ -327,7 +327,7 @@ export default function ProductsPage() {
                       <Badge 
                         key={ing.id}
                         variant={isSelected ? 'default' : 'outline'}
-                        className="cursor-pointer transition-all hover:scale-105"
+                        className="cursor-pointer transition-all hover:scale-105 capitalize"
                         onClick={() => {
                           const newIds = isSelected 
                             ? form.ingredient_ids.filter(id => id !== ing.id)

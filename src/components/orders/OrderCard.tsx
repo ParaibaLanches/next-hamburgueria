@@ -57,61 +57,63 @@ export default function OrderCard({ order, onAdvance, onCancel }: OrderCardProps
 
   return (
     <Card className="hover:shadow-md transition-shadow group relative">
-      <CardContent className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-bold">{order.code}</span>
+      <CardContent className="p-3 space-y-2.5">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-base leading-none">{order.code}</span>
+              <Badge className={`${config.color} text-[9px] px-1.5 py-0 h-4 rounded-sm tracking-wide`}>
+                {config.label.toUpperCase()}
+              </Badge>
+            </div>
+            <div className={`flex items-center gap-1 text-[10px] font-semibold mt-1.5 ${
+              (order.status === 'pending' && (now - new Date(order.created_at || (order as any).createdAt).getTime()) > 8 * 60000) ||
+              (order.status === 'preparing' && (now - new Date(order.updated_at || (order as any).updatedAt).getTime()) > 15 * 60000)
+                ? 'text-orange-600 animate-pulse'
+                : 'text-muted-foreground'
+            }`}>
+              <Clock className="h-3 w-3" />
+              <span>{timeAgo(order.status === 'pending' ? (order.created_at || (order as any).createdAt) : (order.updated_at || (order as any).updatedAt), now)}</span>
+            </div>
+          </div>
+          <div className="text-right flex flex-col items-end">
+            <span className="font-bold text-sm leading-none">{formatCurrency(order.total)}</span>
             <Button 
               size="icon" 
               variant="ghost" 
-              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" 
+              className="h-6 w-6 mt-1 opacity-50 hover:opacity-100" 
               onClick={handlePrint}
             >
-              <Printer className="h-4 w-4" />
+              <Printer className="h-3 w-3" />
             </Button>
           </div>
-          <Badge className={config.color}>{config.label}</Badge>
         </div>
 
-        <div className="space-y-1">
+        <div className="text-xs space-y-0.5 border-t border-dashed pt-2">
           {order.items?.map((item) => (
-            <div key={item.id} className="flex justify-between text-sm">
-              <span>
-                {item.quantity}x {item.product?.name || `Produto #${item.product_id || (item as any).productId}`}
+            <div key={item.id} className="flex justify-between">
+              <span className="truncate pr-2">
+                <span className="font-semibold">{item.quantity}x</span> {item.product?.name || `Produto #${item.product_id || (item as any).productId}`}
               </span>
-              <span className="text-muted-foreground">{formatCurrency((item.unit_price || (item as any).unitPrice || 0) * item.quantity)}</span>
+              <span className="text-muted-foreground shrink-0 text-[11px]">
+                {formatCurrency((item.unit_price || (item as any).unitPrice || 0) * item.quantity)}
+              </span>
             </div>
           ))}
         </div>
 
         {order.notes && (
-          <p className="text-xs text-muted-foreground bg-muted p-2 rounded">
+          <p className="text-[10px] text-muted-foreground bg-muted/50 p-1.5 rounded-sm border">
             {order.notes}
           </p>
         )}
 
-        <div className="flex items-center justify-between pt-2 border-t">
-          <div className={`flex items-center gap-1 text-xs font-bold ${
-            (order.status === 'pending' && (now - new Date(order.created_at || (order as any).createdAt).getTime()) > 8 * 60000) ||
-            (order.status === 'preparing' && (now - new Date(order.updated_at || (order as any).updatedAt).getTime()) > 15 * 60000)
-              ? 'text-orange-600 animate-pulse'
-              : 'text-muted-foreground'
-          }`}>
-            <Clock className="h-3 w-3" />
-            <span>
-              {order.status === 'pending' ? 'Pendente há: ' : 'Preparando há: '}
-              {timeAgo(order.status === 'pending' ? (order.created_at || (order as any).createdAt) : (order.updated_at || (order as any).updatedAt), now)}
-            </span>
-          </div>
-          <span className="font-semibold">{formatCurrency(order.total)}</span>
-        </div>
-
         {(config.next || order.status === 'pending') && (
-          <div className="flex gap-2 pt-1">
+          <div className="flex gap-1.5 pt-1">
             {config.next && onAdvance && (
               <Button
                 size="sm"
-                className="flex-1"
+                className="flex-1 h-7 text-xs font-semibold"
                 onClick={() => onAdvance(order.id, config.next!)}
               >
                 {nextLabel[config.next] || config.next}
@@ -120,8 +122,9 @@ export default function OrderCard({ order, onAdvance, onCancel }: OrderCardProps
             )}
             {['pending', 'preparing', 'ready'].includes(order.status) && onCancel && (
               <Button
-                size="sm"
+                size="icon"
                 variant="destructive"
+                className="h-7 w-7 shrink-0"
                 onClick={() => onCancel(order.id)}
               >
                 <X className="h-3 w-3" />
