@@ -10,8 +10,9 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, Shield, Terminal, ChefHat, UserCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 const roleLabels: Record<string, string> = {
@@ -24,6 +25,12 @@ const roleBadgeVariant: Record<string, 'default' | 'secondary' | 'destructive'> 
   admin: 'destructive',
   cashier: 'default',
   kitchen: 'secondary',
+}
+
+const RoleIcon: Record<string, any> = {
+  admin: Shield,
+  cashier: Terminal,
+  kitchen: ChefHat,
 }
 
 export default function UsersPage() {
@@ -138,22 +145,35 @@ export default function UsersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Funcao</TableHead>
-                <TableHead className="text-right">Acoes</TableHead>
+                <TableHead>Usuário</TableHead>
+                <TableHead>Função</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <Badge variant={roleBadgeVariant[user.role] || 'secondary'}>
-                      {roleLabels[user.role] || user.role}
-                    </Badge>
-                  </TableCell>
+              {users.map((user) => {
+                const Icon = RoleIcon[user.role] || UserCircle2;
+                return (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar>
+                          <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                            {user.name.substring(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className="font-medium leading-none">{user.name}</span>
+                          <span className="text-xs text-muted-foreground mt-1">{user.email}</span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={roleBadgeVariant[user.role] || 'secondary'} className="inline-flex items-center gap-1.5">
+                        <Icon className="h-3 w-3" />
+                        {roleLabels[user.role] || user.role}
+                      </Badge>
+                    </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
                       <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(user)}>
@@ -165,7 +185,8 @@ export default function UsersPage() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>
