@@ -165,15 +165,31 @@ export default function OrdersHistoryPage() {
               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Status</label>
               <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v || 'all')}>
                 <SelectTrigger className="w-full h-10 shadow-sm">
-                  <span className="truncate">{statusFilter === 'all' ? 'Todos' : translateStatus(statusFilter)}</span>
+                  {statusFilter === 'all' ? (
+                    <span className="truncate">Todos</span>
+                  ) : (
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusColor(statusFilter)}`}>
+                      {translateStatus(statusFilter)}
+                    </span>
+                  )}
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all" label="Todos">Todos</SelectItem>
-                  <SelectItem value="pending" label="Pendente">Pendente</SelectItem>
-                  <SelectItem value="preparing" label="Preparando">Preparando</SelectItem>
-                  <SelectItem value="ready" label="Pronto">Pronto</SelectItem>
-                  <SelectItem value="delivered" label="Entregue">Entregue</SelectItem>
-                  <SelectItem value="cancelled" label="Cancelado">Cancelado</SelectItem>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="pending">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusColor('pending')}`}>Pendente</span>
+                  </SelectItem>
+                  <SelectItem value="preparing">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusColor('preparing')}`}>Preparando</span>
+                  </SelectItem>
+                  <SelectItem value="ready">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusColor('ready')}`}>Pronto</span>
+                  </SelectItem>
+                  <SelectItem value="delivered">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusColor('delivered')}`}>Entregue</span>
+                  </SelectItem>
+                  <SelectItem value="cancelled">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${getStatusColor('cancelled')}`}>Cancelado</span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -235,11 +251,11 @@ export default function OrdersHistoryPage() {
                 orders.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell className="font-bold">{order.code}</TableCell>
-                    <TableCell className="text-xs">{formatDateTime(order.created_at)}</TableCell>
+                    <TableCell className="text-xs">{formatDateTime(order.created_at || (order as any).createdAt)}</TableCell>
                     <TableCell>{order.client?.name || order.customer?.name || 'S/ Identificação'}</TableCell>
                     <TableCell>
                       <Badge variant="outline">
-                        {order.order_type === 'delivery' ? 'Entrega' : order.order_type === 'pickup' ? 'Retirada' : 'Local'}
+                        {(order.order_type || (order as any).orderType) === 'delivery' ? 'Entrega' : (order.order_type || (order as any).orderType) === 'pickup' ? 'Retirada' : 'Local'}
                       </Badge>
                     </TableCell>
                     <TableCell className="font-medium">{formatCurrency(order.total)}</TableCell>
@@ -314,11 +330,11 @@ export default function OrdersHistoryPage() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-muted-foreground">Data/Hora</p>
-                  <p className="font-medium">{formatDateTime(selectedOrder.created_at)}</p>
+                  <p className="font-medium">{formatDateTime(selectedOrder.created_at || (selectedOrder as any).createdAt)}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Tipo</p>
-                  <p className="font-medium uppercase">{selectedOrder.order_type}</p>
+                  <p className="font-medium uppercase">{selectedOrder.order_type || (selectedOrder as any).orderType}</p>
                 </div>
               </div>
 
@@ -359,7 +375,7 @@ export default function OrdersHistoryPage() {
                           {item.notes && <p className="text-xs text-muted-foreground italic">"{item.notes}"</p>}
                         </div>
                       </div>
-                      <span className="font-medium">{formatCurrency(item.unit_price * item.quantity)}</span>
+                      <span className="font-medium">{formatCurrency((item.unit_price || (item as any).unitPrice || 0) * item.quantity)}</span>
                     </div>
                   ))}
                 </div>
