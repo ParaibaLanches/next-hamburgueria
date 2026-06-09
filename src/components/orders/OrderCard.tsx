@@ -25,8 +25,8 @@ function timeAgo(dateStr: string, now: number): string {
   const diff = now - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60000)
   if (mins < 1) return 'agora'
-  if (mins < 60) return `${mins}min`
-  return `${Math.floor(mins / 60)}h ${mins % 60}min`
+  if (mins < 60) return `${mins} min`
+  return `${Math.floor(mins / 60)}h ${mins % 60} min`
 }
 
 function formatCurrency(value: number): string {
@@ -77,9 +77,9 @@ export default function OrderCard({ order, onAdvance, onCancel }: OrderCardProps
           {order.items?.map((item) => (
             <div key={item.id} className="flex justify-between text-sm">
               <span>
-                {item.quantity}x {item.product?.name || `Produto #${item.product_id}`}
+                {item.quantity}x {item.product?.name || `Produto #${item.product_id || (item as any).productId}`}
               </span>
-              <span className="text-muted-foreground">{formatCurrency(item.unit_price * item.quantity)}</span>
+              <span className="text-muted-foreground">{formatCurrency((item.unit_price || (item as any).unitPrice || 0) * item.quantity)}</span>
             </div>
           ))}
         </div>
@@ -92,15 +92,15 @@ export default function OrderCard({ order, onAdvance, onCancel }: OrderCardProps
 
         <div className="flex items-center justify-between pt-2 border-t">
           <div className={`flex items-center gap-1 text-xs font-bold ${
-            (order.status === 'pending' && (now - new Date(order.created_at).getTime()) > 8 * 60000) ||
-            (order.status === 'preparing' && (now - new Date(order.updated_at).getTime()) > 15 * 60000)
+            (order.status === 'pending' && (now - new Date(order.created_at || (order as any).createdAt).getTime()) > 8 * 60000) ||
+            (order.status === 'preparing' && (now - new Date(order.updated_at || (order as any).updatedAt).getTime()) > 15 * 60000)
               ? 'text-orange-600 animate-pulse'
               : 'text-muted-foreground'
           }`}>
             <Clock className="h-3 w-3" />
             <span>
               {order.status === 'pending' ? 'Pendente há: ' : 'Preparando há: '}
-              {timeAgo(order.status === 'pending' ? order.created_at : order.updated_at, now)}
+              {timeAgo(order.status === 'pending' ? (order.created_at || (order as any).createdAt) : (order.updated_at || (order as any).updatedAt), now)}
             </span>
           </div>
           <span className="font-semibold">{formatCurrency(order.total)}</span>
