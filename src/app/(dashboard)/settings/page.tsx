@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { maskPhone } from '@/lib/masks'
 import Image from 'next/image'
-import AddressAutocomplete from '@/components/settings/AddressAutocomplete'
+import AddressAutocomplete, { type StoreAddressData, formatFullAddress } from '@/components/settings/AddressAutocomplete'
 import CityList from '@/components/settings/CityList'
 
 declare global {
@@ -495,9 +495,28 @@ export default function SettingsPage() {
                 />
 
                 <AddressAutocomplete 
-                  value={getEffectiveGlobalValue('store_address') || ''}
-                  onChange={(val) => handleGlobalText('store_address', val)}
-                  autocompleteService={autocompleteServiceRef.current}
+                  value={{
+                    cep: getEffectiveGlobalValue('store_cep'),
+                    street: getEffectiveGlobalValue('store_street'),
+                    number: getEffectiveGlobalValue('store_number'),
+                    complement: getEffectiveGlobalValue('store_complement'),
+                    neighborhood: getEffectiveGlobalValue('store_neighborhood'),
+                    city: getEffectiveGlobalValue('store_city'),
+                    state: getEffectiveGlobalValue('store_state'),
+                  }}
+                  onChange={(data: StoreAddressData) => {
+                    setDraftGlobal(prev => ({
+                      ...prev,
+                      store_cep: data.cep,
+                      store_street: data.street,
+                      store_number: data.number,
+                      store_complement: data.complement,
+                      store_neighborhood: data.neighborhood,
+                      store_city: data.city,
+                      store_state: data.state,
+                      store_address: formatFullAddress(data),
+                    }))
+                  }}
                 />
 
                 <div className="space-y-2">

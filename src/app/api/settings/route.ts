@@ -20,6 +20,13 @@ const DEFAULTS: Record<string, string> = {
   delivery_max_radius: '30',
   delivery_allowed_cities: '',
   store_address: '',
+  store_cep: '',
+  store_street: '',
+  store_number: '',
+  store_complement: '',
+  store_neighborhood: '',
+  store_city: '',
+  store_state: '',
   google_maps_api_key: '',
   sidebar_collapsed_default: 'false',
 }
