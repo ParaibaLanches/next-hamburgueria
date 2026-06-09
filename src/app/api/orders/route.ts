@@ -42,9 +42,9 @@ export async function POST(req: Request) {
     let body;
     try {
       body = orderSchema.parse(await req.json())
-    } catch (e) {
-      if (e instanceof z.ZodError) {
-        return NextResponse.json({ success: false, message: (e as unknown as { errors: { message: string }[] }).errors[0]?.message || 'Validation error' }, { status: 400 })
+    } catch (e: any) {
+      if (e && e.name === 'ZodError') {
+        return NextResponse.json({ success: false, message: e.errors?.[0]?.message || 'Validation error' }, { status: 400 })
       }
       throw e;
     }
@@ -57,13 +57,22 @@ export async function POST(req: Request) {
     // Generate random code like "A1B2"
     const code = Math.random().toString(36).substring(2, 6).toUpperCase()
 
+    // Find active closure to attach to this order
+    const activeClosure = await prisma.closure.findFirst({
+      where: { status: 'open' }
+    })
+
     const order = await prisma.order.create({
       data: {
         code,
         orderType: orderType || 'local',
         total,
         notes,
+        deliveryFee: deliveryFee || 0,
+        deliveryDistance: deliveryDistance || 0,
+        discountAmount: discountAmount || 0,
         customerId: customerId ? parseInt(customerId.toString()) : null,
+        closureId: activeClosure?.id,
         items: {
           create: items.map((item: { product_id: string | number; quantity: number; unit_price?: number; notes?: string }) => ({
             productId: parseInt(item.product_id.toString()),

@@ -267,15 +267,17 @@ export default function NewOrderPage() {
     setIsSubmitting(true)
     try {
       const req = {
-        client_id: selectedClient?.id,
-        order_type: orderType,
-        delivery_fee: deliveryFee,
-        delivery_distance: deliveryDistance,
-        notes,
-        coupon_code: appliedCoupon?.code,
+        customerId: selectedClient?.id,
+        orderType: orderType === 'pickup' ? 'takeout' : orderType === 'local' ? 'dine_in' : 'delivery',
+        total: total,
+        deliveryFee: deliveryFee,
+        deliveryDistance: deliveryDistance,
+        discountAmount: discount,
+        notes: orderType === 'delivery' && address ? `${notes}\n\nEndereço de Entrega:\n${address}`.trim() : notes,
         items: cart.map((i) => ({
           product_id: i.product.id,
           quantity: i.quantity,
+          unit_price: i.product.price,
           notes: i.notes,
         })),
         payments: [
@@ -292,8 +294,8 @@ export default function NewOrderPage() {
       } else {
         toast.error(res.error || 'Erro ao criar pedido')
       }
-    } catch {
-      toast.error('Erro ao criar pedido')
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao criar pedido')
     } finally {
       setIsSubmitting(false)
     }
@@ -317,6 +319,24 @@ export default function NewOrderPage() {
       <div className="flex gap-6 h-[calc(100vh-8rem)]">
       {/* Product grid */}
       <div className="flex-1 overflow-y-auto">
+        {/* Warning Widget when Cashier is Closed */}
+        {!isLoadingClosure && !activeClosure && (
+          <div className="mb-4 flex items-center justify-between rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800 shadow-sm">
+            <div className="flex items-center gap-2">
+              <Lock className="h-4 w-4 text-amber-600" />
+              <p className="text-sm font-medium">Caixa fechado. Abra-o para receber pedidos.</p>
+            </div>
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="h-7 border-amber-300 bg-white text-xs font-bold text-amber-700 hover:bg-amber-100"
+              onClick={() => router.push('/closures')}
+            >
+              Abrir Caixa
+            </Button>
+          </div>
+        )}
+
         <div className="flex items-center gap-3 mb-4">
           <Button variant="ghost" size="sm" onClick={() => router.push('/orders')}>
             <ArrowLeft className="h-4 w-4 mr-1" />
@@ -324,34 +344,6 @@ export default function NewOrderPage() {
           </Button>
           <h1 className="text-2xl font-bold">Novo Pedido</h1>
         </div>
-
-        {/* Warning Widget when Cashier is Closed */}
-        {!isLoadingClosure && !activeClosure && (
-          <div className="mb-6">
-            <Card className="border-amber-200/50 bg-amber-50/90">
-              <CardContent className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="bg-amber-100 p-2 rounded-xl shrink-0">
-                    <Lock className="h-5 w-5 text-amber-600" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-black uppercase text-amber-900 tracking-wider">Caixa Fechado</p>
-                    <p className="text-xs text-amber-700 leading-tight">
-                      Você não pode finalizar pedidos agora. Abra o caixa para liberar.
-                    </p>
-                  </div>
-                </div>
-                <Button 
-                  size="sm" 
-                  className="bg-amber-600 hover:bg-amber-700 text-white font-black text-[10px] tracking-widest gap-2 shadow-lg shadow-amber-600/20"
-                  onClick={() => router.push('/closures')}
-                >
-                  ABRIR CAIXA
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
         <ProductGrid products={products} categories={categories} onAdd={addToCart} />
       </div>
 

@@ -17,8 +17,9 @@ export class AppError extends Error {
 export function extractMessage(err: unknown): string {
   // Axios error with API response body
   if (isAxiosError(err)) {
-    const data = err.response?.data as ApiResponse<unknown> | undefined
+    const data = err.response?.data as any
     if (data?.error) return data.error
+    if (data?.message) return data.message
     if (err.message) return err.message
   }
   // Already an AppError — message already clean
