@@ -31,8 +31,8 @@ export async function GET(req: Request) {
         // Only send updates for this client's orders
         if (orderData.customerId === client.id) {
           const formattedEvent = {
-            order_id: orderData.id,
-            status: orderData.status,
+            event: 'order_updated',
+            data: orderData,
             message: `O status do pedido #${orderData.id} mudou para ${orderData.status}`,
             timestamp: new Date().toISOString(),
           }
