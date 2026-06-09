@@ -12,7 +12,7 @@ import { maskDocument, maskPhone } from '@/lib/masks'
 import type { CartItem, Client, Coupon, OrderType } from '@/types'
 import { getFullImageUrl } from '@/api/client'
 import { useConfigStore } from '@/stores/configStore'
-import { MutableRefObject } from 'react'
+import { MutableRefObject, useState, useEffect } from 'react'
 
 interface CartSidebarProps {
   cart: CartItem[]
@@ -78,6 +78,73 @@ export default function CartSidebar({
   handleSubmit, isSubmitting, activeClosure
 }: CartSidebarProps) {
   const { getBool } = useConfigStore()
+
+  const [cep, setCep] = useState('')
+  const [street, setStreet] = useState('')
+  const [number, setNumber] = useState('')
+  const [neighborhood, setNeighborhood] = useState('')
+  const [complement, setComplement] = useState('')
+  const [localCity, setLocalCity] = useState('')
+  const [stateUF, setStateUF] = useState('')
+  const [isFetchingCep, setIsFetchingCep] = useState(false)
+
+  // Sincronizar dados do cliente se selecionado
+  useEffect(() => {
+    if (selectedClient && orderType === 'delivery') {
+      setCep(selectedClient.zip_code || '')
+      setStreet(selectedClient.street || selectedClient.address || '')
+      setNumber(selectedClient.number || '')
+      setNeighborhood(selectedClient.neighborhood || '')
+      setComplement(selectedClient.complement || '')
+      setLocalCity(selectedClient.city || '')
+      setStateUF(selectedClient.state || '')
+    }
+  }, [selectedClient, orderType])
+
+  // Atualizar string `address` pro pai calcular o Google Maps
+  useEffect(() => {
+    if (orderType === 'delivery') {
+      const parts = []
+      if (street) parts.push(street)
+      if (number) parts.push(number)
+      const stNum = parts.join(', ')
+      
+      const parts2 = []
+      if (neighborhood) parts2.push(neighborhood)
+      if (localCity) parts2.push(localCity)
+      const nbCity = parts2.join(', ')
+      
+      let finalAddr = stNum
+      if (nbCity) finalAddr += ` - ${nbCity}`
+      if (stateUF) finalAddr += ` - ${stateUF}`
+      
+      setAddress(finalAddr)
+      setSelectedCity(localCity)
+    }
+  }, [street, number, neighborhood, localCity, stateUF, orderType, setAddress, setSelectedCity])
+
+  const handleCepChange = async (val: string) => {
+    const raw = val.replace(/\D/g, '')
+    const formatted = raw.replace(/^(\d{5})(\d)/, '$1-$2').substring(0, 9)
+    setCep(formatted)
+    
+    if (raw.length === 8) {
+      setIsFetchingCep(true)
+      try {
+         const res = await fetch(`https://viacep.com.br/ws/${raw}/json/`)
+         const data = await res.json()
+         if (!data.erro) {
+           setStreet(data.logradouro || '')
+           setNeighborhood(data.bairro || '')
+           setLocalCity(data.localidade || '')
+           setStateUF(data.uf || '')
+         }
+      } catch(e) {
+      } finally {
+        setIsFetchingCep(false)
+      }
+    }
+  }
 
   return (
     <Card className="w-96 flex flex-col shrink-0">
@@ -324,20 +391,65 @@ export default function CartSidebar({
 
         {orderType === 'delivery' && (
           <div className="space-y-2 animate-in slide-in-from-top-2">
-            <Label className="text-xs">Endereço de Entrega</Label>
-            <div className="relative">
-              <Input
-                ref={addressInputRef}
-                placeholder="Rua, número, bairro..."
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="h-9 pr-8"
-              />
-              {isCalculatingFee && (
-                <Loader2 className="absolute right-2 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />
-              )}
+            <Label className="text-xs font-bold text-primary">Endereço de Entrega</Label>
+            
+            <div className="flex gap-2">
+              <div className="relative w-1/3">
+                <Input 
+                   placeholder="CEP" 
+                   value={cep} 
+                   onChange={(e) => handleCepChange(e.target.value)}
+                   className="h-9 text-xs"
+                   maxLength={9}
+                />
+                {isFetchingCep && <Loader2 className="absolute right-2 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />}
+              </div>
+              <div className="relative flex-1">
+                <Input 
+                   placeholder="Rua/Avenida" 
+                   value={street}
+                   onChange={(e) => setStreet(e.target.value)}
+                   className="h-9 text-xs"
+                />
+              </div>
             </div>
-            {deliveryDistance > 0 && (
+
+            <div className="flex gap-2">
+              <Input 
+                 placeholder="Número" 
+                 value={number}
+                 onChange={(e) => setNumber(e.target.value)}
+                 className="h-9 w-24 text-xs"
+              />
+              <Input 
+                 placeholder="Complemento" 
+                 value={complement}
+                 onChange={(e) => setComplement(e.target.value)}
+                 className="h-9 flex-1 text-xs"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Input 
+                 placeholder="Bairro" 
+                 value={neighborhood}
+                 onChange={(e) => setNeighborhood(e.target.value)}
+                 className="h-9 flex-1 text-xs"
+              />
+              <Input 
+                 placeholder="Cidade" 
+                 value={localCity}
+                 onChange={(e) => setLocalCity(e.target.value)}
+                 className="h-9 flex-1 text-xs"
+              />
+            </div>
+
+            {isCalculatingFee && (
+               <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                 <Loader2 className="h-3 w-3 animate-spin" /> Calculando frete...
+               </div>
+            )}
+            {!isCalculatingFee && deliveryDistance > 0 && (
               <div className="flex justify-between text-[10px] font-medium text-emerald-600 bg-emerald-50 p-1 px-2 rounded">
                 <span>Distância: {deliveryDistance.toFixed(1)} km</span>
                 <span>Frete por KM: Ativo</span>

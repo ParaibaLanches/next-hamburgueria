@@ -40,7 +40,7 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
               <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{product.description}</p>
             )}
           </div>
-          <Button size="icon" variant="ghost" className="shrink-0 h-8 w-8 bg-primary/5 group-hover:bg-primary transition-colors group-hover:text-primary-foreground">
+          <Button size="icon" variant="ghost" className="shrink-0 h-8 w-8 bg-primary/5 text-primary group-hover:bg-primary group-hover:text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground transition-colors">
             <Plus className="h-4 w-4" />
           </Button>
         </div>
