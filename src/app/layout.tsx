@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Paraíba Lanches PDV",
-  description: "Sistema de PDV e Logística",
+  description: "Sistema de PDV",
 };
 
 export default function RootLayout({

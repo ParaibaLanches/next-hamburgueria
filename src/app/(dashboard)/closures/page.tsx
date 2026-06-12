@@ -611,7 +611,7 @@ export default function ClosurePage() {
                 <div className="flex items-start gap-3 text-xs text-amber-800 bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 max-w-md">
                     <AlertCircle className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
                     <p className="leading-tight font-medium opacity-90">
-                        O caixa será bloqueado e os totais consolidados. <strong>Operação definitiva.</strong>
+                        O caixa será bloqueado e os totais consolidados.
                     </p>
                 </div>
                 <div className="flex gap-3 shrink-0">
