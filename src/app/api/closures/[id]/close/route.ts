@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = parseInt(params.id)
+    const resolvedParams = await params
+    const id = parseInt(resolvedParams.id)
     if (isNaN(id)) return NextResponse.json({ success: false, message: 'Invalid ID' }, { status: 400 })
 
     const closure = await prisma.closure.findUnique({ where: { id } })

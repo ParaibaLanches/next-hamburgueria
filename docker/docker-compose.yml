@@ -3,16 +3,19 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.dev
-    volumes:
-      - ..:/app
-      - /app/node_modules
-      - /app/.next
+    # volumes:
+    #   - ..:/app
+    #   - /app/node_modules
+    #   - /app/.next
+    command: sh -c "npm run build && npm start"
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - DATABASE_URL=postgresql://caixa:caixapass@postgres:5432/caixa_db?schema=public
       - JWT_SECRET=caixa_super_secret_key_123
       - REDIS_URL=redis://redis:6379
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - postgres
       - redis
@@ -29,7 +32,7 @@ services:
       - POSTGRES_PASSWORD=caixapass
       - POSTGRES_DB=caixa_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
